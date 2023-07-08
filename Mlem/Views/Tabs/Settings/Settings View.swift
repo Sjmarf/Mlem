@@ -58,6 +58,16 @@ struct SettingsView: View {
                             Text("General")
                         }
                     }
+                    
+                    NavigationLink {
+                        AboutMlemSettingsView()
+                    } label: {
+                        HStack(alignment: .center) {
+                            Image(systemName: "gearshape.circle.fill")
+                                .foregroundColor(.gray)
+                            Text("General")
+                        }
+                    }
 
                     NavigationLink {
                         AppearanceSettingsView()

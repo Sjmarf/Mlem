@@ -59,5 +59,6 @@ struct AlternativeIconCell: View {
 struct AlternativeIconCellPreview: PreviewProvider {
     static var previews: some View {
         AlternativeIconCell(icon: AlternativeIcon(id: nil, name: "Default", author: "Mlem team", selected: true)) { _ in }
+            .padding(20)
     }
 }
