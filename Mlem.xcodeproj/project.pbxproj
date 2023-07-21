@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		030AC04F2A6464DA00037155 /* CommunitySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 030AC04E2A6464DA00037155 /* CommunitySettingsView.swift */; };
 		030AC0522A64666C00037155 /* UserSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 030AC0512A64666C00037155 /* UserSettingsView.swift */; };
+		038DB0342A6ABEB7003E87BD /* PostDisplayModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038DB0322A6ABEB7003E87BD /* PostDisplayModeView.swift */; };
+		038DB0352A6ABEB7003E87BD /* PostPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038DB0332A6ABEB7003E87BD /* PostPreviewView.swift */; };
+		038DB0372A6AE2A8003E87BD /* DragAndDropTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 038DB0362A6AE2A8003E87BD /* DragAndDropTest.swift */; };
 		03B643572A6864CD00F65700 /* TabBarSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B643562A6864CD00F65700 /* TabBarSettingsView.swift */; };
 		03BAA23A2A57DC1400D48252 /* TimestampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03BAA2392A57DC1400D48252 /* TimestampView.swift */; };
 		03E0B9C82A61F0F400FED265 /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E0B9C72A61F0F400FED265 /* AdvancedSettingsView.swift */; };
@@ -350,6 +353,9 @@
 /* Begin PBXFileReference section */
 		030AC04E2A6464DA00037155 /* CommunitySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunitySettingsView.swift; sourceTree = "<group>"; };
 		030AC0512A64666C00037155 /* UserSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsView.swift; sourceTree = "<group>"; };
+		038DB0322A6ABEB7003E87BD /* PostDisplayModeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostDisplayModeView.swift; sourceTree = "<group>"; };
+		038DB0332A6ABEB7003E87BD /* PostPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostPreviewView.swift; sourceTree = "<group>"; };
+		038DB0362A6AE2A8003E87BD /* DragAndDropTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragAndDropTest.swift; sourceTree = "<group>"; };
 		03B643562A6864CD00F65700 /* TabBarSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarSettingsView.swift; sourceTree = "<group>"; };
 		03BAA2392A57DC1400D48252 /* TimestampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimestampView.swift; sourceTree = "<group>"; };
 		03E0B9C72A61F0F400FED265 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
@@ -751,7 +757,10 @@
 		030AC0452A62F89000037155 /* Post */ = {
 			isa = PBXGroup;
 			children = (
+				038DB0322A6ABEB7003E87BD /* PostDisplayModeView.swift */,
+				038DB0332A6ABEB7003E87BD /* PostPreviewView.swift */,
 				CD14461A2A5A4B6D00610EF1 /* PostSettingsView.swift */,
+				038DB0362A6AE2A8003E87BD /* DragAndDropTest.swift */,
 			);
 			path = Post;
 			sourceTree = "<group>";
@@ -2016,6 +2025,7 @@
 				CD14461B2A5A4B6D00610EF1 /* PostSettingsView.swift in Sources */,
 				CD7B53B52A5F251400006E81 /* CreatePrivateMessageReportRequest.swift in Sources */,
 				CD64832D2A38CE4E00EE6CA3 /* Vote Complex Style.swift in Sources */,
+				038DB0352A6ABEB7003E87BD /* PostPreviewView.swift in Sources */,
 				637218492A3A2AAD008C4816 /* APICommentReplyView.swift in Sources */,
 				6317ABCB2A37292700603D76 /* FeedType.swift in Sources */,
 				CD6483382A3A0F2200EE6CA3 /* NSFW Tag.swift in Sources */,
@@ -2155,6 +2165,7 @@
 				CDA217EE2A630F3300BDA173 /* ReportPost.swift in Sources */,
 				6372185B2A3A2AAD008C4816 /* APICommunityView.swift in Sources */,
 				637218552A3A2AAD008C4816 /* APITagline.swift in Sources */,
+				038DB0372A6AE2A8003E87BD /* DragAndDropTest.swift in Sources */,
 				6322A5CB27F77A4D00135D4F /* Loading View.swift in Sources */,
 				CD6483302A38D31C00EE6CA3 /* Standard Vote Complex.swift in Sources */,
 				030AC0522A64666C00037155 /* UserSettingsView.swift in Sources */,
@@ -2165,6 +2176,7 @@
 				CD391F942A533B7700E213B5 /* RespondableProtocol.swift in Sources */,
 				CD69F56F2A41EDF50028D4F7 /* Swipey Actions.swift in Sources */,
 				CD391F902A533AFF00E213B5 /* ReplyToFeedPost.swift in Sources */,
+				038DB0342A6ABEB7003E87BD /* PostDisplayModeView.swift in Sources */,
 				637218632A3A2AAD008C4816 /* CreatePost.swift in Sources */,
 				CDE6A80B2A43E9F00062D161 /* CommentSortType.swift in Sources */,
 				503BA26F2A2C94540052516C /* URL+Identifiable.swift in Sources */,
