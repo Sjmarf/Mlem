@@ -14,3 +14,15 @@ struct APISiteView: Decodable {
     let localSiteRateLimit: APILocalSiteRateLimit
     let counts: APISiteAggregates
 }
+
+extension APISiteView: Equatable {
+    static func == (lhs: APISiteView, rhs: APISiteView) -> Bool {
+        lhs.hashValue == rhs.hashValue
+    }
+}
+
+extension APISiteView: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.site.actorId)
+    }
+}

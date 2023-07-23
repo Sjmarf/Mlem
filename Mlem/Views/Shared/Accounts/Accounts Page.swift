@@ -13,7 +13,6 @@ struct AccountsPage: View {
     @EnvironmentObject var accountsTracker: SavedAccountTracker
     @Environment(\.forceOnboard) var forceOnboard
     
-    @State private var isShowingInstanceAdditionSheet: Bool = false
     @State var selectedAccount: SavedAccount?
     
     let onboarding: Bool
@@ -24,39 +23,34 @@ struct AccountsPage: View {
         let instances = Array(accountsTracker.accountsByInstance.keys)
         
         Group {
-            if onboarding || instances.isEmpty || isShowingInstanceAdditionSheet {
-                AddSavedInstanceView(onboarding: onboarding,
-                                     currentAccount: $selectedAccount)
-            } else {
-                List {
-                    ForEach(instances, id: \.self) { instance in
-                        Section(header: Text(instance)) {
-                            ForEach(accountsTracker.accountsByInstance[instance] ?? []) { account in
-                                Button(account.username) {
-                                    dismiss()
-                                    
-                                    // this tiny delay prevents the modal dismiss animation from being cancelled
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                                        appState.setActiveAccount(account)
-                                    }
+            List {
+                ForEach(instances, id: \.self) { instance in
+                    Section(header: Text(instance)) {
+                        ForEach(accountsTracker.accountsByInstance[instance] ?? []) { account in
+                            Button(account.username) {
+                                dismiss()
+                                
+                                // this tiny delay prevents the modal dismiss animation from being cancelled
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                    appState.setActiveAccount(account)
                                 }
-                                .swipeActions {
-                                    Button("Delete", role: .destructive) {
-                                        accountsTracker.removeAccount(account: account, appState: appState, forceOnboard: forceOnboard)
-                                    }
-                                }
-                                .foregroundColor(appState.currentActiveAccount == account ? .secondary : .primary)
                             }
+                            .swipeActions {
+                                Button("Delete", role: .destructive) {
+                                    accountsTracker.removeAccount(account: account, appState: appState, forceOnboard: forceOnboard)
+                                }
+                            }
+                            .foregroundColor(appState.currentActiveAccount == account ? .secondary : .primary)
                         }
                     }
-                    
-                    Button {
-                        isShowingInstanceAdditionSheet = true
-                    } label: {
-                        Text("Add Account")
-                    }
-                    .accessibilityLabel("Add a new account.")
                 }
+                
+                NavigationLink {
+                    NewAddAccountView()
+                } label: {
+                    Text("Add Account")
+                }
+                .accessibilityLabel("Add a new account.")
             }
         }
         .onAppear {

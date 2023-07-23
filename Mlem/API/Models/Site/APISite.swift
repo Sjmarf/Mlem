@@ -22,3 +22,15 @@ struct APISite: Decodable {
     let publicKey: String
     let instanceId: Int
 }
+
+extension APISite: Equatable {
+    static func == (lhs: APISite, rhs: APISite) -> Bool {
+        lhs.actorId == rhs.actorId
+    }
+}
+
+extension APISite: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.actorId)
+    }
+}
