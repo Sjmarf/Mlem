@@ -27,7 +27,7 @@ struct AccountsPage: View {
                 AddSavedInstanceView(onboarding: onboarding,
                                      currentAccount: $selectedAccount)
             } else {
-                List {
+                Form {
                     ForEach(instances, id: \.self) { instance in
                         Section(header: Text(instance)) {
                             ForEach(accountsTracker.accountsByInstance[instance] ?? []) { account in

@@ -13,8 +13,11 @@ struct FancyTabBar<Selection: FancyTabBarSelection, Content: View>: View {
     @Binding private var selection: Selection
     private let content: () -> Content
     
+    @State private var presentationDetent: PresentationDetent = .height(50)
     @State private var tabItemKeys: [Selection] = []
     @State private var tabItems: [Selection: FancyTabItemLabelBuilder<Selection>] = [:]
+    
+    @State private var sheetOpen: Bool = false
     
     var dragUpGestureCallback: (() -> Void)?
     
@@ -29,14 +32,45 @@ struct FancyTabBar<Selection: FancyTabBarSelection, Content: View>: View {
     var body: some View {
         ZStack(content: content)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .safeAreaInset(edge: .bottom, alignment: .center) {
-                // this VStack/Spacer()/ignoresSafeArea thing prevents the keyboard from pushing the bar up
-                VStack {
-                    Spacer()
-                    tabBar
+            .sheet(isPresented: .constant(true)) {
+                VStack(spacing: 0) {
+                    Divider()
+                    GeometryReader { geometry in
+                        ZStack {
+                            VStack {
+                                tabBar
+                                Spacer()
+                            }
+                            .opacity((400.0 - geometry.size.height) / 350.0)
+                            VStack {
+                                Capsule()
+                                    .frame(width: 50, height: 5)
+                                    .foregroundStyle(.tertiary)
+                                    .padding(7)
+                                    .transition(.scale.combined(with: .opacity))
+                                AccountsPage(onboarding: false)
+                                    .scrollContentBackground(.hidden)
+                            }
+                            .opacity((geometry.size.height - 50) / 350.0)
+                        }
+                    }
                 }
-                .ignoresSafeArea(.keyboard, edges: .bottom)
+                .presentationDetents([.height(50), .height(400)], selection: $presentationDetent)
+                .presentationBackground(.thinMaterial)
+                .presentationBackgroundInteraction(.enabled)
+                .presentationDragIndicator(.hidden)
+                .presentationCornerRadius(0)
+                .interactiveDismissDisabled()
             }
+            
+//            .safeAreaInset(edge: .bottom, alignment: .center) {
+//                // this VStack/Spacer()/ignoresSafeArea thing prevents the keyboard from pushing the bar up
+//                VStack {
+//                    Spacer()
+//                    tabBar
+//                }
+//                .ignoresSafeArea(.keyboard, edges: .bottom)
+//            }
             .environment(\.tabSelectionHashValue, selection.hashValue)
             .onPreferenceChange(FancyTabItemPreferenceKey<Selection>.self) {
                 self.tabItemKeys = $0
@@ -48,8 +82,6 @@ struct FancyTabBar<Selection: FancyTabBarSelection, Content: View>: View {
     
     private var tabBar: some View {
         VStack(spacing: 0) {
-            Divider()
-            
             HStack(spacing: 0) {
                 ForEach(tabItemKeys, id: \.hashValue) { key in
                     tabItems[key]?.label()
@@ -75,7 +107,7 @@ struct FancyTabBar<Selection: FancyTabBarSelection, Content: View>: View {
                         }
                     }
             )
-            .background(.thinMaterial)
         }
-        .accessibilityElement(children: .contain)    }
+        .accessibilityElement(children: .contain)
+    }
 }
