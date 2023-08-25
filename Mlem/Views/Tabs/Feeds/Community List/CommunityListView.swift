@@ -23,10 +23,11 @@ struct CommunityListView: View {
     @EnvironmentObject var favoritedCommunitiesTracker: FavoriteCommunitiesTracker
     @EnvironmentObject var appState: AppState
     @Environment(\.openURL) var openURL
-    @Environment(\.navigationPath) var navigationPath
     @AppStorage("defaultFeed") var defaultFeed: FeedType = .subscribed
 
     @State var subscribedCommunities = [APICommunity]()
+    
+    @State var searchText: String = ""
 
     // swiftlint:disable line_length
     private static let alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
@@ -42,57 +43,100 @@ struct CommunityListView: View {
     }
 
     var body: some View {
+        
         ScrollViewReader { scrollProxy in
-            HStack {
+            ZStack(alignment: .trailing) {
                 List(selection: $selectedCommunity) {
-                    HomepageFeedRowView(
-                        feedType: .subscribed,
-                        iconName: AppConstants.subscribedFeedSymbolNameFill,
-                        iconColor: .red,
-                        description: "Subscribed communities from all servers"
-                    )
-                    .id("top") // For "scroll to top" sidebar item
-                    HomepageFeedRowView(
-                        feedType: .local,
-                        iconName: AppConstants.localFeedSymbolNameFill,
-                        iconColor: .green,
-                        description: "Local communities from your server"
-                    )
-                    HomepageFeedRowView(
-                        feedType: .all,
-                        iconName: AppConstants.federatedFeedSymbolNameFill,
-                        iconColor: .blue,
-                        description: "All communities that federate with your server"
-                    )
+                    Section("Feeds") {
+                        VStack {
+                            HomepageFeedRowView(
+                                feedType: .subscribed,
+                                iconName: AppConstants.subscribedFeedSymbolNameFill,
+                                iconColor: .red,
+                                description: "Subscribed communities from all servers"
+                            )
+                            .id("top") // For "scroll to top" sidebar item
+                            HomepageFeedRowView(
+                                feedType: .local,
+                                iconName: AppConstants.localFeedSymbolNameFill,
+                                iconColor: .green,
+                                description: "Local communities from your server"
+                            )
+                            HomepageFeedRowView(
+                                feedType: .all,
+                                iconName: AppConstants.federatedFeedSymbolNameFill,
+                                iconColor: .blue,
+                                description: "All communities that federate with your server"
+                            )
+                        }
+                        VStack(spacing: 12) {
+                            HStack(spacing: 12) {
+                                FeedButtonView(
+                                    feedType: .subscribed,
+                                    title: "Subscribed",
+                                    iconName: "newspaper.fill",
+                                    iconColor: .red
+                                )
+                                FeedButtonView(
+                                    feedType: .local,
+                                    title: "Local",
+                                    iconName: "house.fill",
+                                    iconColor: .orange
+                                )
+                            }
+                            HStack(spacing: 12) {
+                                FeedButtonView(
+                                    feedType: .all,
+                                    title: "All",
+                                    iconName: "circle.hexagongrid.fill",
+                                    iconColor: .blue
+                                )
+                                FeedButtonView(
+                                    feedType: .subscribed,
+                                    title: "Saved",
+                                    iconName: "bookmark.fill",
+                                    iconColor: .green
+                                )
+                            }
+                        }
+                        .listRowInsets(EdgeInsets())
+                    }
+                    .listRowBackground(Color.clear)
 
                     ForEach(calculateVisibleCommunitySections()) { communitySection in
                         Section(header:
                             HStack {
                                 Text(communitySection.inlineHeaderLabel!).accessibilityLabel(communitySection.accessibilityLabel)
+
                                 Spacer()
-                            }.id(communitySection.viewId)) {
-                                ForEach(
-                                    calculateCommunityListSections(for: communitySection),
-                                    id: \.id
-                                ) { listedCommunity in
-                                    CommuntiyFeedRowView(
-                                        community: listedCommunity,
-                                        subscribed: subscribedCommunities.contains(listedCommunity),
-                                        communitySubscriptionChanged: hydrateCommunityData
-                                    )
-                                }
                             }
+                            .id(communitySection.viewId)
+                        ) {
+                            ForEach(
+                                calculateCommunityListSections(for: communitySection),
+                                id: \.id
+                            ) { listedCommunity in
+                                CommunityListRowView(
+                                    community: listedCommunity,
+                                    subscribed: subscribedCommunities.contains(listedCommunity),
+                                    communitySubscriptionChanged: hydrateCommunityData
+                                )
+                            }
+                        }
                     }
                 }
                 .fancyTabScrollCompatible()
                 .navigationTitle("Communities")
                 .navigationBarColor()
-                .listStyle(PlainListStyle())
+                .listStyle(.insetGrouped)
                 .scrollIndicators(.hidden)
+                // .padding(.trailing, 10)
 
-                SectionIndexTitles(proxy: scrollProxy, communitySections: communitySections)
+                CommunityListSidebarView(proxy: scrollProxy, communitySections: communitySections)
             }
         }
+        .background(Color(.systemGroupedBackground))
+        .searchable(text: $searchText)
         .refreshable {
             await refreshCommunitiesList()
         }
@@ -207,82 +251,6 @@ struct CommunityListView: View {
         result = Array(Set(result)).sorted()
 
         return result
-    }
-}
-
-// Original article here: https://www.fivestars.blog/code/section-title-index-swiftui.html
-struct SectionIndexTitles: View {
-    @Dependency(\.hapticManager) var hapticManager
-    
-    let proxy: ScrollViewProxy
-    let communitySections: [CommunitySection]
-    @GestureState private var dragLocation: CGPoint = .zero
-
-    // Track which sidebar label we picked last to we
-    // only haptic when selecting a new one
-    @State var lastSelectedLabel: String = ""
-
-    var body: some View {
-        VStack {
-            ForEach(communitySections) { communitySection in
-                HStack {
-                    if communitySection.sidebarEntry.sidebarIcon != nil {
-                        SectionIndexImage(image: communitySection.sidebarEntry.sidebarIcon!)
-                            .padding(.trailing)
-                    } else if communitySection.sidebarEntry.sidebarLabel != nil {
-                        SectionIndexText(label: communitySection.sidebarEntry.sidebarLabel!)
-                            .padding(.trailing)
-                    } else {
-                        EmptyView()
-                    }
-                }
-                .background(dragObserver(viewId: communitySection.viewId))
-            }
-        }
-        .gesture(
-            DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                .updating($dragLocation) { value, state, _ in
-                    state = value.location
-                }
-        )
-    }
-
-    func dragObserver(viewId: String) -> some View {
-        GeometryReader { geometry in
-            dragObserver(geometry: geometry, viewId: viewId)
-        }
-    }
-
-    func dragObserver(geometry: GeometryProxy, viewId: String) -> some View {
-        if geometry.frame(in: .global).contains(dragLocation) {
-            if viewId != lastSelectedLabel {
-                DispatchQueue.main.async {
-                    lastSelectedLabel = viewId
-                    proxy.scrollTo(viewId, anchor: .center)
-
-                    // Play nice tappy taps
-                    // HapticManager.shared.rigidInfo()
-                    hapticManager.play(haptic: .rigidInfo, priority: .low)
-                }
-            }
-        }
-        return Rectangle().fill(Color.clear)
-    }
-}
-
-// Sidebar Label Views
-struct SectionIndexText: View {
-    let label: String
-    var body: some View {
-        Text(label).font(.system(size: 12)).bold()
-    }
-}
-
-struct SectionIndexImage: View {
-    let image: String
-    var body: some View {
-        Image(systemName: image).resizable()
-            .frame(width: 8, height: 8)
     }
 }
 

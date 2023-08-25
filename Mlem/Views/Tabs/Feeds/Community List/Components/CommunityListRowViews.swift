@@ -30,7 +30,7 @@ struct FavoriteStarButtonStyle: ButtonStyle {
     }
 }
 
-struct CommuntiyFeedRowView: View {
+struct CommunityListRowView: View {
     @Dependency(\.communityRepository) var communityRepository
     @Dependency(\.errorHandler) var errorHandler
     @Dependency(\.hapticManager) var hapticManager
@@ -45,26 +45,18 @@ struct CommuntiyFeedRowView: View {
 
     var body: some View {
         NavigationLink(value: CommunityLinkWithContext(community: community, feedType: .subscribed)) {
-            HStack {
-                // NavigationLink with invisible array
-                communityNameLabel
-
-                Spacer()
-                Button("Favorite Community") {
-                    hapticManager.play(haptic: .gentleSuccess, priority: .high)
-
-                    toggleFavorite()
-
-                }.buttonStyle(FavoriteStarButtonStyle(isFavorited: isFavorited()))
-                    .accessibilityHidden(true)
-            }
+            content
         }.swipeActions {
             if subscribed {
-                Button("Unsubscribe") {
+                Button {
                     Task(priority: .userInitiated) {
                         await subscribe(communityId: community.id, shouldSubscribe: false)
                     }
-                }.tint(.red) // Destructive role seems to remove from list so just make it red
+                } label: {
+                    Image(systemName: "person.crop.circle.fill.badge.xmark")
+                }
+                .accessibilityLabel("Unsubscribe")
+                .tint(.red) // Destructive role seems to remove from list so just make it red
             } else {
                 Button("Subscribe") {
                     Task(priority: .userInitiated) {
@@ -79,21 +71,63 @@ struct CommuntiyFeedRowView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(communityLabel)
     }
+    
+    private var content: some View {
+        HStack(spacing: 15) {
+            Group {
+                if let url = community.icon {
+                    CachedImage(
+                        url: url.withIcon64Parameters,
+                        shouldExpand: false,
+                        fixedSize: CGSize(width: 36, height: 36),
+                        imageNotFound: defaultCommunityAvatar,
+                        contentMode: .fill
+                    )
+                } else {
+                    defaultCommunityAvatar()
+                }
+            }
+            .clipShape(Circle())
+            .overlay(Circle()
+                .stroke(
+                    Color(UIColor.secondarySystemBackground),
+                    lineWidth: shouldClipAvatar(community: community) ? 1 : 0
+                ))
+            .frame(width: 36, height: 36)
+            .accessibilityHidden(true)
 
-    private var communityNameText: Text {
-        Text(community.name)
-    }
-
-    @ViewBuilder
-    private var communityNameLabel: some View {
-        if let website = community.actorId.host(percentEncoded: false) {
-            communityNameText +
-                Text("@\(website)")
-                .font(.footnote)
-                .foregroundColor(.gray.opacity(0.5))
-        } else {
-            communityNameText
+            VStack(alignment: .leading, spacing: 0) {
+                Text(community.name)
+                
+                if let instanceName = community.actorId.host(percentEncoded: false) {
+                    Text("@\(instanceName)")
+                        .font(.footnote)
+                        .foregroundColor(.gray.opacity(0.5))
+                }
+            }
         }
+    }
+    
+    private func defaultCommunityAvatar() -> AnyView {
+        AnyView(
+            ZStack {
+                VStack {
+                    Spacer()
+                    Image(systemName: "building.2.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 24)
+                        .foregroundStyle(.white)
+                }
+                .scaledToFit()
+                .mask(
+                    Circle()
+                        .frame(width: 30, height: 30)
+                )
+            }
+            .frame(maxWidth: .infinity)
+            .background(.tertiary)
+        )
     }
 
     private var communityLabel: String {
