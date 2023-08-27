@@ -25,11 +25,14 @@ struct FeedRoot: View {
 
     var body: some View {
         NavigationSplitView {
-            CommunityListView(selectedCommunity: $rootDetails, account: appState.currentActiveAccount)
-                .id(appState.currentActiveAccount.id)
+            Group {
+                CommunityListView(selectedCommunity: $rootDetails, account: appState.currentActiveAccount)
+                    .id(appState.currentActiveAccount.id)
+            }
+            .handleLemmyViews()
         } detail: {
-            if let rootDetails {
-                NavigationStack(path: $navigationPath) {
+            NavigationStack(path: $navigationPath) {
+                if let rootDetails {
                     FeedView(
                         community: rootDetails.community,
                         feedType: rootDetails.feedType,
@@ -38,10 +41,10 @@ struct FeedRoot: View {
                     )
                     .environmentObject(appState)
                     .handleLemmyViews()
+                    .id(rootDetails.id + appState.currentActiveAccount.id)
+                } else {
+                    Text("Please select a community")
                 }
-                .id(rootDetails.id + appState.currentActiveAccount.id)
-            } else {
-                Text("Please select a community")
             }
         }
         .handleLemmyLinkResolution(

@@ -20,6 +20,8 @@ struct CommunityListView: View {
     
     @StateObject private var model: CommunityListModel
     
+    @Environment(\.navigationPath) private var navigationPath
+    
     @Binding var selectedCommunity: CommunityLinkWithContext?
 
     init(selectedCommunity: Binding<CommunityLinkWithContext?>, account: SavedAccount) {
@@ -33,6 +35,9 @@ struct CommunityListView: View {
         ScrollViewReader { scrollProxy in
             HStack {
                 List(selection: $selectedCommunity) {
+                    Button("Test") {
+                        navigationPath.wrappedValue.append(CommunityLinkWithContext(community: nil, feedType: .subscribed))
+                    }
                     HomepageFeedRowView(
                         feedType: .subscribed,
                         iconName: AppConstants.subscribedFeedSymbolNameFill,
