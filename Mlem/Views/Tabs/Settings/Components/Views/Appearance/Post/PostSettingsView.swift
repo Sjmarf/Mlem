@@ -127,7 +127,7 @@ struct PostSettingsView: View {
             }
             
             Section("Website Previews") {
-                WebsiteIconComplex(post:
+                WebsiteEmbedView(post:
                     APIPost(
                         id: 0,
                         name: "",

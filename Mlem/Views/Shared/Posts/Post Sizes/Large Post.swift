@@ -225,7 +225,7 @@ struct LargePost: View {
         case .link:
             VStack(spacing: AppConstants.postAndCommentSpacing) {
                 if layoutMode != .minimize {
-                    WebsiteIconComplex(post: postView.post, onTapActions: markPostAsRead)
+                    WebsiteEmbedView(post: postView.post, onTapActions: markPostAsRead, showSummaryButton: isExpanded)
                 }
                 postBodyView
             }

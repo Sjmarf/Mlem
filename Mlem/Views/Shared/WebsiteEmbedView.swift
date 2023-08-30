@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct WebsiteIconComplex: View {
+struct WebsiteEmbedView: View {
     @AppStorage("shouldShowWebsitePreviews") var shouldShowWebsitePreviews: Bool = true
     @AppStorage("shouldShowWebsiteFaviconAtAll") var shouldShowWebsiteFaviconAtAll: Bool = true
     @AppStorage("shouldShowWebsiteHost") var shouldShowWebsiteHost: Bool = true
@@ -16,13 +16,18 @@ struct WebsiteIconComplex: View {
     @AppStorage("shouldShowWebsiteIcon") var shouldShowWebsiteIcon: Bool = true
 
     let post: APIPost
+    let showSummaryButton: Bool
     var onTapActions: (() -> Void)?
+    
+    @State var showingSummary: Bool = false
     
     init(
         post: APIPost,
-        onTapActions: (() -> Void)? = nil
+        onTapActions: (() -> Void)? = nil,
+        showSummaryButton: Bool = false
     ) {
         self.post = post
+        self.showSummaryButton = showSummaryButton
         self.onTapActions = onTapActions
     }
 
@@ -87,6 +92,26 @@ struct WebsiteIconComplex: View {
                 Text(linkLabel)
                     .font(.subheadline)
                     .fontWeight(.semibold)
+                
+                if showSummaryButton {
+                    Button {
+                        showingSummary = true
+                    } label: {
+                        Text("Read Summary")
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .strokeBorder(.tertiary)
+                            )
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .sheet(isPresented: $showingSummary) {
+                        WebsiteSummaryView(url: post.url!)
+                    }
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(AppConstants.postAndCommentSpacing)
